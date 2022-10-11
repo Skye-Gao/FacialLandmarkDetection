@@ -9,7 +9,7 @@
 
 // Face Mesh - https://github.com/tensorflow/tfjs-models/tree/master/facemesh
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import "./App.css";
 import * as tf from "@tensorflow/tfjs";
 // OLD MODEL
@@ -19,10 +19,15 @@ import * as tf from "@tensorflow/tfjs";
 import * as facemesh from "@tensorflow-models/face-landmarks-detection";
 import Webcam from "react-webcam";
 import { drawMesh } from "./utilities";
+import Game from "./game_of_life";
+
+
 
 function App() {
+  const [facedata, setFacedata] = useState([]);
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
+
 
   //  Load posenet
   const runFacemesh = async () => {
@@ -62,11 +67,15 @@ function App() {
       //       const face = await net.estimateFaces(video);
       // NEW MODEL
       const face = await net.estimateFaces({input:video});
-      console.log(face);
+      setFacedata(face);
+      // console.log(face);
 
       // Get canvas context
+      if (canvasRef.current){
       const ctx = canvasRef.current.getContext("2d");
+      
       requestAnimationFrame(()=>{drawMesh(face, ctx)});
+      }
     }
   };
 
@@ -79,7 +88,7 @@ function App() {
           ref={webcamRef}
           style={{
             position: "absolute",
-            marginLeft: "auto",
+            marginLeft: "5%",
             marginRight: "auto",
             left: 0,
             right: 0,
@@ -94,15 +103,29 @@ function App() {
           ref={canvasRef}
           style={{
             position: "absolute",
-            marginLeft: "auto",
+            marginLeft:"65%",
             marginRight: "auto",
             left: 0,
             right: 0,
-            textAlign: "center",
-            zindex: 9,
+            textAlign: "left",
+            zindex:20,
             width: 640,
             height: 480,
+            backgroundColor: "rgba(255, 255, 255, 1)",
           }}
+        />
+         <Game
+         facedata={facedata}
+         style={{
+          position: "absolute",
+          marginLeft:"5%",
+          marginRight: "auto",
+          left: 0,
+          right: 0,
+          textAlign: "left",
+          zindex:200,
+          backgroundColor: "rgba(255, 255, 255, 1)",
+        }}
         />
       </header>
     </div>
